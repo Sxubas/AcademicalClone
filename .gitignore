@@ -12,4 +12,4 @@ yarn-error.log
 *.sln
 
 #'Database' file
-courses.json
+courses.js
