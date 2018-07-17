@@ -1,5 +1,5 @@
 <template>
-  <div class="result-container">
+  <div class="result-container" @click="addLocalClass">
     <div class="top-info">
       <div>{{result.class + ' ' + result.course}}</div>
       <div>sección {{result.section}}</div>
@@ -21,8 +21,14 @@
 <script>
 export default {
   props:[
-    'result'
+    'result',
+    'addClass'
   ],
+  methods: {
+    addLocalClass(){
+      this.addClass(this.result);
+    }
+  },
   computed: {
     title(){
       return this.result.title.toLowerCase();

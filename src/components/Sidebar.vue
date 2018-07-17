@@ -5,7 +5,7 @@
       <input class="search" v-model="search" placeholder="Buscar por CRN o nombre de la materia"/>
     </div>
     <div class="search-results">
-      <AcademicalSearchResults :search="search"/>
+      <AcademicalSearchResults :search="search" :addClass="addClass"/>
     </div>
   </div>
 </template>
@@ -18,6 +18,9 @@ export default {
   components:{
     AcademicalSearchResults
   },
+  props:[
+    'addClass'
+  ],
   data(){
     return {
       search: ''

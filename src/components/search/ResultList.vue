@@ -1,7 +1,7 @@
 <template>
   <div class="resultsContainer">
     <div v-for="result in results" :key="result.crn">
-      <AcademicalSearchResult :result=result />
+      <AcademicalSearchResult :result=result :addClass="addClass" />
     </div>
   </div>
 </template>
@@ -16,7 +16,8 @@ export default {
     AcademicalSearchResult
   },
   props:[
-    'search'
+    'search',
+    'addClass'
   ],
   computed: {
     results(){
