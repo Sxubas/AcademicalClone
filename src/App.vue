@@ -4,11 +4,11 @@
     <div id='container'>
       <AcademicalSidebar :addClass="addClass"/>
       <div class='schedule-container'>
-        <Schedule
-          :time-ground="['06:30', '20:00']" 
-          :week-ground="['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado']" 
-          :task-detail="schedule">
-        </Schedule>
+        <CustomSchedule
+          :timeGround="[6, 20]" 
+          :weekGround="['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado']" 
+          :taskDetail="schedule">
+        </CustomSchedule>
       </div>
     </div>
   </div>
@@ -17,14 +17,14 @@
 <script>
 import AcademicalSidebar from './components/Sidebar';
 import AcademicalBanner from './components/Banner';
-
+import CustomSchedule from './components/CustomSchedule';
 const jsonDays = ["L", "M", "I", "J", "V", "S", "D"];
-
 export default {
   name: 'app',
   components:{
     AcademicalBanner,
-    AcademicalSidebar
+    AcademicalSidebar,
+    CustomSchedule
   },
   data () {
     return {
@@ -37,7 +37,6 @@ export default {
       let schedule = [
         [],[],[],[],[],[] //Models days from monday to saturday
       ]
-
       for(const class_ of this.classes){
         for(const classSchedule of class_.schedules){
           for(const day of jsonDays){
@@ -60,7 +59,6 @@ export default {
   methods: {
     addClass(_class){
       const conflicts = this.checkConflicts(_class);
-
       if (conflicts.length > 0)
       {
         alert(conflicts);
@@ -96,7 +94,6 @@ export default {
         const endA = parseInt(plannedSchedule.dateEnd.split(':').join(''))
         const startB = parseInt(schedule.time_ini)
         const endB = parseInt(schedule.time_fin)
-
         //There is a conflict if
         if(startA >= startB && startA < endB){ //The start date of A is between the start and end of B
           return plannedSchedule;
@@ -128,11 +125,9 @@ export default {
 </script>
 
 <style>
-
 body{
   margin: 0px;
 }
-
 #app {
   font-family: 'Avenir', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -142,38 +137,30 @@ body{
   height: 100vh;
   width: 100vw;
 }
-
 #container{
   display: flex;
   flex-direction: row;
 }
-
 .schedule-container{
   width: 100%;
   height: 900px;
-  margin-left: 10%;
   font-size: 10px;
   overflow-y: scroll;
 }
-
 .schedule{
   max-width: 2000;
 }
-
 html{
   overflow-x: hidden;
   overflow-y: hidden;
   padding: 0;
 }
-
 h1, h2 {
   font-weight: normal;
 }
-
 span{
   padding-top: 35px;
 }
-
 ul {
   list-style-type: none;
   padding: 0;
