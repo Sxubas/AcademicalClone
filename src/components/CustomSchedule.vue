@@ -1,0 +1,174 @@
+<template>
+<div class="container">
+   <div id="background-grid" class="schedule-grid">
+        <div v-for="n in totalCells" :key="n" class="cell">{{ textBackgroundCell(calcPositionCell(n)) }}</div>
+   </div>
+   <div id="courses-grid" class="schedule-grid">
+       <div v-for="course in scheduleArray" class="course-cell" :style="coursePosition(course)">{{course.title}}</div>
+   </div> 
+</div>
+</template>
+
+<script>
+const jsonDays = ["L", "M", "I", "J", "V", "S", "D"];
+export default {
+    props:[
+    'timeGround',
+    'weekGround',
+    'taskDetail'
+  ],
+  computed: {
+      daysWithSpace() {
+          let arr=[];
+          for(let day in this.weekGround){
+              arr.push(this.weekGround[day].substring(0,3));
+          }
+          return arr;
+      },
+      hoursCount(){
+          return (this.timeGround[1]-this.timeGround[0])*2
+      },
+      totalCells(){
+          return (this.timeGround[1]-this.timeGround[0])*2 * (this.weekGround.length+1)
+      },
+      scheduleArray(){
+          console.log("holi",this.taskDetail);
+          let arr= this.taskDetail;
+          let coursesArray=[];
+          for (let i = 0; i < arr.length; i++) {
+              if(arr[i])
+              {
+                   for (let j = 0; j < arr[i].length; j++) {
+                       arr[i][j].day=jsonDays[i];
+                       coursesArray.push(arr[i][j]);
+                   }
+
+              }
+          }
+          console.log("hola",coursesArray);
+          return coursesArray;
+      }
+  },
+  methods: {
+      colClass(day){
+          let x="calc("+(100/this.weekGround.length)+ "% - "+150/this.weekGround.length+"px)"
+          return {width: x};
+      },
+      calcPositionCell(number){
+          let col = (number)%(this.weekGround.length+1);
+          col = col==0 ? this.weekGround.length+1: col;
+          let row= Math.floor(number/(this.weekGround.length+1));
+          if(number % (this.weekGround.length+1)==0){
+              row--;
+          }
+          return row + "-" + col;
+      },
+      textBackgroundCell(strCell){
+          let row= strCell.split('-')[0];
+          let col= strCell.split('-')[1];
+          if(row==0)
+          {
+            if(col==1) return "";
+             return this.weekGround[col-2];
+          }
+          if(col==1)
+          {
+              if(row%2==1)
+              {
+                  let initHour=+this.timeGround[0];
+                  let intervalAdd=+((+row-1)/2);
+                  let totalSum= initHour+intervalAdd;
+                  return totalSum+ ":00";
+              }
+          }
+          return "";
+      },
+      coursePosition(course){
+          let col=-1;
+          for(let i=0; i<jsonDays.length; i++){
+              if(jsonDays[i]===course.day){
+                  col=i+2;
+                  console.log('enc',col);
+                  break;
+              }
+          }
+		
+		  let row= 0;
+		  let hour= course.dateStart.split(':')[0];
+		  let minutes= course.dateStart.split(':')[1];
+		  let despl= (hour-this.timeGround[0])*2;
+		  row=despl+2;
+		  let horaInic= course.dateStart.split(':')[0];
+		  let horaFin= course.dateEnd.split(':')[0];
+		  let minInic= course.dateStart.split(':')[1];
+		  let minFin= course.dateEnd.split(':')[1];
+		  if(minutes==="30")
+		  {
+			row++;
+		  }
+		  let duracion= (+horaFin*60 - +horaInic*60)+ +minFin - +minInic;
+		  console.log(duracion);
+		  duracion= (duracion+10)/30;
+		  console.log(course.dateStart + " " +course.dateEnd);
+		  console.log(duracion);
+		  return {'grid-column': col, 'grid-row': row + ' / span ' + duracion};
+      }
+  },
+  mounted(){
+      let grid= document.getElementById('background-grid');
+      grid.style.gridTemplateColumns="100px repeat("+this.weekGround.length+",1fr)" 
+      grid.style.gridTemplateRows="repeat("+this.hoursCount+",1fr)" 
+
+      grid= document.getElementById('courses-grid');
+      grid.style.gridTemplateColumns="100px repeat("+this.weekGround.length+",1fr)" 
+      grid.style.gridTemplateRows="repeat("+this.hoursCount+",1fr)" 
+
+  }
+
+}
+</script>
+<style scoped>
+
+.cell{
+    display:inline-block;
+    border:1px solid #5d626b;
+    width: 100%;
+    height: 100%;
+    font-size:1rem;
+    background-color: #eee;
+    text-align: center;
+	box-sizing:border-box;
+}
+
+.container{
+    position:relative;
+    height: 100%;
+}
+
+.schedule-grid{
+    display:grid;
+    height:100%;
+    width:100%;
+}
+
+.course-cell
+{
+    display:inline-block;
+    border:1px solid #5d626b;
+    width: 100%;
+    max-height: 100%;
+    font-size:1rem;
+    background-color: #4286f4;
+    text-align: center;
+	border-radius: 10px 10px 10px 10px; 
+}
+
+#courses-grid{
+    z-index: 10;
+    position:absolute;
+    top:0;
+    left:0;
+}
+
+</style>
+
