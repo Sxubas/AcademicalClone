@@ -1,5 +1,5 @@
 <template>
-  <div class="result-container" @click="addLocalClass">
+  <div class="result-container" @click="addLocalClass" @mouseover="hoverLocalClass" @mouseleave="unhoverLocalClass">
     <div class="top-info">
       <div>{{result.class + ' ' + result.course}}</div>
       <div>sección {{result.section}}</div>
@@ -22,11 +22,19 @@
 export default {
   props:[
     'result',
-    'addClass'
+    'addClass',
+    'hoverClass',
+    'unhoverClass'
   ],
   methods: {
     addLocalClass(){
       this.addClass(this.result);
+    },
+    hoverLocalClass(){
+      this.hoverClass(this.result);
+    },
+    unhoverLocalClass(){
+      this.unhoverClass();
     }
   },
   computed: {

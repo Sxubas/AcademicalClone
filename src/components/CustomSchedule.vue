@@ -5,6 +5,7 @@
    </div>
    <div id="courses-grid" class="schedule-grid">
        <div v-for="course in scheduleArray" class="course-cell" :style="coursePosition(course)">{{course.title}}</div>
+       <div v-for="hoveredClass in hoveredClassSchedules" class="course-cell" :style="[coursePosition(hoveredClass), hoveredStyle(hoveredClass)]">{{hoveredClass.title}}</div>
    </div> 
 </div>
 </template>
@@ -15,7 +16,8 @@ export default {
     props:[
     'timeGround',
     'weekGround',
-    'taskDetail'
+    'taskDetail',
+    'hoveredClassSchedules'
   ],
   computed: {
       daysWithSpace() {
@@ -84,6 +86,7 @@ export default {
           return "";
       },
       coursePosition(course){
+        if(course){
           let col=-1;
           for(let i=0; i<jsonDays.length; i++){
               if(jsonDays[i]===course.day){
@@ -92,26 +95,37 @@ export default {
                   break;
               }
           }
-		
-		  let row= 0;
-		  let hour= course.dateStart.split(':')[0];
-		  let minutes= course.dateStart.split(':')[1];
-		  let despl= (hour-this.timeGround[0])*2;
-		  row=despl+2;
-		  let horaInic= course.dateStart.split(':')[0];
-		  let horaFin= course.dateEnd.split(':')[0];
-		  let minInic= course.dateStart.split(':')[1];
-		  let minFin= course.dateEnd.split(':')[1];
-		  if(minutes==="30")
-		  {
-			row++;
-		  }
-		  let duracion= (+horaFin*60 - +horaInic*60)+ +minFin - +minInic;
-		  console.log(duracion);
-		  duracion= (duracion+10)/30;
-		  console.log(course.dateStart + " " +course.dateEnd);
-		  console.log(duracion);
-		  return {'grid-column': col, 'grid-row': row + ' / span ' + duracion};
+      
+          let row= 0;
+          let hour= course.dateStart.split(':')[0];
+          let minutes= course.dateStart.split(':')[1];
+          let despl= (hour-this.timeGround[0])*2;
+          row=despl+2;
+          let horaInic= course.dateStart.split(':')[0];
+          let horaFin= course.dateEnd.split(':')[0];
+          let minInic= course.dateStart.split(':')[1];
+          let minFin= course.dateEnd.split(':')[1];
+          if(minutes==="30")
+          {
+          row++;
+          }
+          let duracion= (+horaFin*60 - +horaInic*60)+ +minFin - +minInic;
+          console.log(duracion);
+          duracion= (duracion+10)/30;
+          console.log(course.dateStart + " " +course.dateEnd);
+          console.log(duracion);
+          return {'grid-column': col, 'grid-row': row + ' / span ' + duracion};
+        }
+        else
+          return {};
+      },
+      hoveredStyle(hoveredClass){
+        if(this.hoveredClassSchedules.conflicts.length > 0){
+          return { 'background-color': 'red' }
+        }
+        else{
+          return {};
+        }
       }
   },
   mounted(){
