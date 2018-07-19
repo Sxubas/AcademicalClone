@@ -5,7 +5,7 @@
    </div>
    <div id="courses-grid" class="schedule-grid">
        <div v-for="course in scheduleArray" class="course-cell" :style="coursePosition(course)">{{course.title}}</div>
-       <div v-for="hoveredClass in hoveredClassSchedules" class="course-cell" :style="[coursePosition(hoveredClass), hoveredStyle(hoveredClass)]">{{hoveredClass.title}}</div>
+       <div v-for="hoveredClass in hoveredClassArray" class="course-cell" :style="[coursePosition(hoveredClass), hoveredStyle(hoveredClass)]">{{hoveredClass.title}}</div>
    </div> 
 </div>
 </template>
@@ -36,6 +36,23 @@ export default {
       scheduleArray(){
           console.log("holi",this.taskDetail);
           let arr= this.taskDetail;
+          let coursesArray=[];
+          for (let i = 0; i < arr.length; i++) {
+              if(arr[i])
+              {
+                   for (let j = 0; j < arr[i].length; j++) {
+                       arr[i][j].day=jsonDays[i];
+                       coursesArray.push(arr[i][j]);
+                   }
+
+              }
+          }
+          console.log("hola",coursesArray);
+          return coursesArray;
+      },
+      hoveredClassArray(){
+          console.log("holawe",this.hoveredClassSchedules);
+          let arr= this.hoveredClassSchedules;
           let coursesArray=[];
           for (let i = 0; i < arr.length; i++) {
               if(arr[i])
@@ -111,6 +128,7 @@ export default {
           }
           let duracion= (+horaFin*60 - +horaInic*60)+ +minFin - +minInic;
           console.log(duracion);
+          console.log(course);
           duracion= (duracion+10)/30;
           console.log(course.dateStart + " " +course.dateEnd);
           console.log(duracion);
@@ -121,10 +139,10 @@ export default {
       },
       hoveredStyle(hoveredClass){
         if(this.hoveredClassSchedules.conflicts.length > 0){
-          return { 'background-color': 'red' }
+          return { 'background-color': 'rgba(212,98,98,0.7)', 'transform' : 'translate(5px, 5px)' }
         }
         else{
-          return {};
+          return { 'background-color': 'rgba(84,155,226,0.7)' }
         }
       }
   },
