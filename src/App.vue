@@ -127,6 +127,7 @@ export default {
       return class_.title;
     },
     hoverClass(_class){
+      console.log(_class);
       const conflicts = this.checkConflicts(_class);
       _class.conflicts = conflicts;
       this.hoveredClass = _class;
@@ -137,11 +138,14 @@ export default {
     convertBannerToSchedules(_class){
       if(!_class)
         return []; //Return empty array when null object is passed
-      let schedules = [];
+      let schedules = [
+        [],[],[],[],[],[] //Models days from monday to saturday
+      ]
       for(const classSchedule of _class.schedules){
         for(const day of jsonDays){
           if(classSchedule[day]){
-            schedules.push({
+            const index = jsonDays.indexOf(day)
+            schedules[index].push({
               dateStart: this.convertToDate(classSchedule.time_ini),
               dateEnd: this.convertToDate(classSchedule.time_fin),
               title: this.convertTitle(_class.title),

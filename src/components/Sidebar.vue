@@ -53,7 +53,8 @@ export default {
   display: flex;
   flex-direction: row;
   justify-content: center;
-  width: 100%
+  width: 100%;
+  height: 3vh;
 }
 .search{
   background-color: #0000;
@@ -64,6 +65,7 @@ export default {
 
 .search-results{
   overflow-y: auto;
+  height: calc(97vh - 80px);
 }
 
 </style>
