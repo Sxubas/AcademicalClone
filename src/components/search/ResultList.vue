@@ -1,7 +1,11 @@
 <template>
   <div class="resultsContainer">
     <div v-for="result in results" :key="result.crn">
-      <AcademicalSearchResult :result=result :addClass="addClass" />
+      <AcademicalSearchResult 
+        :result=result
+        :addClass="addClass" 
+        :hoverClass="hoverClass"
+        :unhoverClass="unhoverClass"/>
     </div>
   </div>
 </template>
@@ -17,7 +21,9 @@ export default {
   },
   props:[
     'search',
-    'addClass'
+    'addClass',
+    'hoverClass',
+    'unhoverClass'
   ],
   computed: {
     results(){

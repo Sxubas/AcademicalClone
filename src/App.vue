@@ -2,13 +2,18 @@
   <div id="app">
     <AcademicalBanner />
     <div id='container'>
-      <AcademicalSidebar :addClass="addClass"/>
+      <AcademicalSidebar 
+        :addClass="addClass"
+        :hoverClass="hoverClass"
+        :unhoverClass="unhoverClass"
+        />
       <div class='schedule-container'>
         <CustomSchedule
           :timeGround="[6, 20]" 
           :weekGround="['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado']" 
-          :taskDetail="schedule">
-        </CustomSchedule>
+          :taskDetail="schedule"
+          :hoveredClassSchedules="convertBannerToSchedules(hoveredClass)"
+          />
       </div>
     </div>
   </div>
@@ -29,6 +34,7 @@ export default {
   data () {
     return {
       classes: [],
+      hoveredClass: undefined,
       schedule_:[]
     }
   },
@@ -119,6 +125,34 @@ export default {
     },
     generateDetail(class_){
       return class_.title;
+    },
+    hoverClass(_class){
+      const conflicts = this.checkConflicts(_class);
+      _class.conflicts = conflicts;
+      this.hoveredClass = _class;
+    },
+    unhoverClass(){
+      this.hoveredClass = undefined;
+    },
+    convertBannerToSchedules(_class){
+      if(!_class)
+        return []; //Return empty array when null object is passed
+      let schedules = [];
+      for(const classSchedule of _class.schedules){
+        for(const day of jsonDays){
+          if(classSchedule[day]){
+            schedules.push({
+              dateStart: this.convertToDate(classSchedule.time_ini),
+              dateEnd: this.convertToDate(classSchedule.time_fin),
+              title: this.convertTitle(_class.title),
+              detail: this.generateDetail(_class)
+            });
+          }
+        }
+      }
+
+      schedules.conflicts = _class.conflicts;
+      return schedules;
     }
   }
 }
