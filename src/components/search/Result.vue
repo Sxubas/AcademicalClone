@@ -6,15 +6,34 @@
       <div>CRN: {{result.nrc}}</div>
     </div>
     <div class="title">{{title}}</div>
-    <div v-if="result.instructors.length > 0" class="instructor">Instructores:</div>
-    <div v-else class="instructor">Instructores por asignar</div>
-    <div 
-      v-for="instructor in result.instructors"
-      :key="instructor.name"
-      class="instructor"
-    >
-    {{instructor.name.toLowerCase()}}
+    <div class="bottom-container">
+      <div class="instructor-container">
+        <div v-if="result.instructors.length > 0" class="instructor">Instructores:</div>
+        <div v-else class="instructor">Instructores por asignar</div>
+        <div 
+          v-for="instructor in result.instructors"
+          :key="instructor.name"
+          class="instructor"
+        >
+        {{instructor.name.toLowerCase()}}
+        </div>
+      </div>
+      <div v-if="result.cycle != '1'" class="icon-container">
+        <i 
+          v-tooltip="'Curso de 8 semanas'"
+          class="material-icons">alarm</i>
+        <i 
+          v-if="result.cycle === '8A'"
+          v-tooltip="'Primer ciclo del semestre'"
+          class="material-icons">filter_1</i>
+        <i 
+          v-if="result.cycle === '8B'"
+          v-tooltip="'Segundo ciclo del semestre'"
+          class="material-icons">filter_2</i>
+      </div>
     </div>
+    
+    
   </div>
 </template>
 
@@ -93,8 +112,21 @@ export default {
   margin: 6px 0px;
 }
 
+.bottom-container{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
 .instructor{
   font-size: 0.8rem;
   text-align: left;
 }
+
+.icon-container{
+  position: sticky;
+  bottom: 0;
+  right: 0;
+}
+
 </style>

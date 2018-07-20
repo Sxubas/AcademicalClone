@@ -53,7 +53,8 @@ export default {
     'hoverClass',
     'unhoverClass',
     'registeringCompl',
-    'magistralClass'
+    'magistralClass',
+    'isCompl'
   ],
   computed: {
     results(){

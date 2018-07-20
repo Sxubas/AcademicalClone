@@ -34,7 +34,7 @@ export default {
           return (this.timeGround[1]-this.timeGround[0])*2 * (this.weekGround.length+1)
       },
       scheduleArray(){
-          console.log("holi",this.taskDetail);
+          //console.log("holi",this.taskDetail);
           let arr= this.taskDetail;
           let coursesArray=[];
           for (let i = 0; i < arr.length; i++) {
@@ -47,11 +47,11 @@ export default {
 
               }
           }
-          console.log("hola",coursesArray);
+          //console.log("hola",coursesArray);
           return coursesArray;
       },
       hoveredClassArray(){
-          console.log("holawe",this.hoveredClassSchedules);
+          //console.log("holawe",this.hoveredClassSchedules);
           let arr= this.hoveredClassSchedules;
           let coursesArray=[];
           for (let i = 0; i < arr.length; i++) {
@@ -64,7 +64,7 @@ export default {
 
               }
           }
-          console.log("hola",coursesArray);
+          //console.log("hola",coursesArray);
           return coursesArray;
       }
   },
@@ -108,7 +108,7 @@ export default {
           for(let i=0; i<jsonDays.length; i++){
               if(jsonDays[i]===course.day){
                   col=i+2;
-                  console.log('enc',col);
+                  //console.log('enc',col);
                   break;
               }
           }
@@ -127,11 +127,11 @@ export default {
           row++;
           }
           let duracion= (+horaFin*60 - +horaInic*60)+ +minFin - +minInic;
-          console.log(duracion);
-          console.log(course);
+          //console.log(duracion);
+          //console.log(course);
           duracion= (duracion+10)/30;
-          console.log(course.dateStart + " " +course.dateEnd);
-          console.log(duracion);
+          //console.log(course.dateStart + " " +course.dateEnd);
+          //console.log(duracion);
           return {'grid-column': col, 'grid-row': row + ' / span ' + duracion};
         }
         else

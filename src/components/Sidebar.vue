@@ -1,7 +1,22 @@
 <template>
   <div class="sidebar-container">
+    <div class="icon-container">
+      <i  
+        v-tooltip="'Más información'"        
+        class="material-icons">help_outline</i>
+      <i 
+        v-tooltip="'Mostrar cursos de las primeras 8 semanas del semestre'" 
+        :class="{ selected : showing8A }"
+        @click="showA"
+        class="material-icons">filter_1</i>
+      <i 
+        v-tooltip="'Mostrar cursos de las últimas 8 semanas del semestre'"
+        :class="{ selected : !showing8A }"
+        @click="showB"
+        class="material-icons">filter_2</i>
+    </div>
     <div class="search-bar">
-      <i class="material-icons">search</i>      
+      <i class="material-icons">search</i>
       <input class="search" v-model="search" placeholder="Buscar por CRN o nombre de la materia"/>
     </div>
     <div v-if="registeringCompl" class="info-container">
@@ -40,7 +55,10 @@ export default {
     'registeringCompl',
     'magistralClass',
     'isCompl',
-    'cancelCompl'
+    'cancelCompl',
+    'showing8A',
+    'showA',
+    'showB'
   ],
   data(){
     return {
@@ -64,6 +82,21 @@ export default {
   color: whitesmoke;
 }
 
+.icon-container{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-around;
+  border-top: 4px whitesmoke solid;
+  border-bottom: 4px whitesmoke solid;
+  padding: 6px 0px;
+}
+
+.selected{
+  background-color: rgb(35, 116, 187);
+  border: 1px whitesmoke dashed;
+}
+
 .info-container{
   display: flex;
   padding: 4px;
@@ -77,15 +110,20 @@ export default {
 .search-bar{
   display: flex;
   flex-direction: row;
+  align-items: center;
   justify-content: center;
   width: 100%;
+  padding: 8px 0px;
   height: 3vh;
+  font-size: 1.05rem;
+  min-height: 1.05rem;
 }
 .search{
   background-color: #0000;
   color: whitesmoke;
   border: none;
-  width: 90%
+  width: 90%;
+  font-size: 1rem;
 }
 
 .search-results{
@@ -120,5 +158,25 @@ export default {
   font-size: 1.1rem;
   font-weight: 600;
 }
+
+i{
+  padding: 2px;
+  transition: background-color 0.2s ease-in-out;
+  user-select: none;
+  -moz-user-select: none;
+  -khtml-user-select: none;
+  -webkit-user-select: none;
+  -o-user-select: none;
+  cursor: pointer;
+}
+
+i:hover{
+  background-color: rgb(83, 153, 214);
+}
+
+i:active{
+  background-color: rgb(35, 116, 187);  
+}
+
 
 </style>
