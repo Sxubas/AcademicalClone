@@ -9,7 +9,7 @@
         />
       <div class='schedule-container'>
         <CustomSchedule
-          :timeGround="[6, 20]" 
+          :timeGround="[6, 21]" 
           :weekGround="['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado']" 
           :taskDetail="schedule"
           :hoveredClassSchedules="convertBannerToSchedules(hoveredClass)"
@@ -144,13 +144,37 @@ export default {
       for(const classSchedule of _class.schedules){
         for(const day of jsonDays){
           if(classSchedule[day]){
-            const index = jsonDays.indexOf(day)
-            schedules[index].push({
-              dateStart: this.convertToDate(classSchedule.time_ini),
-              dateEnd: this.convertToDate(classSchedule.time_fin),
-              title: this.convertTitle(_class.title),
-              detail: this.generateDetail(_class)
-            });
+            
+            let isDuplicated = false;
+
+            //Store in variables to avoid calling parsing multiple times
+            const newDateStart = this.convertToDate(classSchedule.time_ini);
+            const newDateEnd = this.convertToDate(classSchedule.time_fin);
+            const newTitle = this.convertTitle(_class.title);
+            const newDetail = this.generateDetail(_class);
+
+            const index = jsonDays.indexOf(day);
+
+            for(const schedule of schedules[index]){
+              if(
+                newDateStart === schedule.dateStart &&
+                newDateEnd === schedule.dateEnd &&
+                newTitle === schedule.title &&
+                newDetail === schedule.detail
+                ){
+                isDuplicated = true;
+                break;
+              }
+            }
+
+            if(!isDuplicated){
+              schedules[index].push({
+                dateStart: this.convertToDate(classSchedule.time_ini),
+                dateEnd: this.convertToDate(classSchedule.time_fin),
+                title: this.convertTitle(_class.title),
+                detail: this.generateDetail(_class)
+              });
+            }
           }
         }
       }

@@ -11,5 +11,7 @@ yarn-error.log
 *.njsproj
 *.sln
 
-#'Database' file
+#'Database' files
 courses.js
+courses8A.js
+courses8B.js
