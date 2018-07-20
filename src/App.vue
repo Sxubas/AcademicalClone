@@ -20,6 +20,7 @@
           :weekGround="['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado']" 
           :taskDetail="schedule"
           :hoveredClassSchedules="convertBannerToSchedules(hoveredClass)"
+          :removeClass="removeClass"
           />
       </div>
     </div>
@@ -65,7 +66,8 @@ export default {
                   dateStart: this.convertToDate(classSchedule.time_ini),
                   dateEnd: this.convertToDate(classSchedule.time_fin),
                   title: this.convertTitle(class_.title),
-                  detail: this.generateDetail(class_)
+                  detail: this.generateDetail(class_),
+                  nrc: class_.nrc
                 })
               }
             }
@@ -234,6 +236,18 @@ export default {
     },
     showB(){
       this.showing8A = false;
+    },
+    removeClass(class_){
+      for(const _class of this.classes){
+        if(_class.nrc === class_.nrc){
+          const index = this.classes.indexOf(_class);
+          this.classes.splice(index, 1)
+          this.flash('Clase "' + class_.title.toLowerCase() + '" removida correctamente', 'success', {
+            important: true,
+            timeout: 4400
+          })
+        }
+      }
     }
   }
 }
