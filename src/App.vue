@@ -6,16 +6,24 @@
         :addClass="addClass"
         :hoverClass="hoverClass"
         :unhoverClass="unhoverClass"
+        :magistralClass="magistralClass"
+        :registeringCompl="registeringCompl"
+        :isCompl="isCompl"
+        :cancelCompl="cancelCompl"
+        :showing8A="showing8A"
+        :showA="showA"
+        :showB="showB"
         />
       <div class='schedule-container'>
         <CustomSchedule
-          :timeGround="[6, 20]" 
+          :timeGround="[6, 21]" 
           :weekGround="['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado']" 
           :taskDetail="schedule"
           :hoveredClassSchedules="convertBannerToSchedules(hoveredClass)"
           />
       </div>
     </div>
+    <flash-message class="flash-message"/>
   </div>
 </template>
 
@@ -35,7 +43,11 @@ export default {
     return {
       classes: [],
       hoveredClass: undefined,
-      schedule_:[]
+      schedule_:[],
+      registeringCompl: false,
+      magistralClass: {},
+      isCompl: false,
+      showing8A: true
     }
   },
   computed: {
@@ -44,16 +56,18 @@ export default {
         [],[],[],[],[],[] //Models days from monday to saturday
       ]
       for(const class_ of this.classes){
-        for(const classSchedule of class_.schedules){
-          for(const day of jsonDays){
-            if(classSchedule[day]){
-              const index = jsonDays.indexOf(day)
-              schedule[index].push({
-                dateStart: this.convertToDate(classSchedule.time_ini),
-                dateEnd: this.convertToDate(classSchedule.time_fin),
-                title: this.convertTitle(class_.title),
-                detail: this.generateDetail(class_)
-              })
+        if((class_.cycle === '8A' && this.showing8A) || (class_.cycle === '8B' && !this.showing8A) || class_.cycle === "1"){
+          for(const classSchedule of class_.schedules){
+            for(const day of jsonDays){
+              if(classSchedule[day]){
+                const index = jsonDays.indexOf(day)
+                schedule[index].push({
+                  dateStart: this.convertToDate(classSchedule.time_ini),
+                  dateEnd: this.convertToDate(classSchedule.time_fin),
+                  title: this.convertTitle(class_.title),
+                  detail: this.generateDetail(class_)
+                })
+              }
             }
           }
         }
@@ -67,15 +81,42 @@ export default {
       const conflicts = this.checkConflicts(_class);
       if (conflicts.length > 0)
       {
-        alert(conflicts);
-        console.log(conflicts)
-        //Alert with proper info
+        let conflictsStr = ''
+        for(const conflict of conflicts){
+          conflictsStr += '<br>' + conflict.title + ' [' + conflict.day + ']'
+        }
+        this.flash('No se puede agregar la clase "' + _class.title.toLowerCase() + '" porque entra en conflicto con: ' + conflictsStr, 'error', {
+          important: false,
+          timeout: 4000,
+          pauseOnInteract: true
+        });
       }
       else
       {
-        this.classes.push(_class)
-        //Alert class successfully created
-        alert('Bien!')
+        if(_class.compl.length > 0 || _class.mag.length > 0){
+          if(_class.mag.length > 0){
+            this.isCompl = true;
+          }
+          this.magistralClass = _class;
+          this.registeringCompl = true;
+        }
+        else if(this.registeringCompl){
+          this.classes.push(this.magistralClass, _class);
+          this.magistralClass = {};
+          this.registeringCompl = false;
+          if(this.isCompl)
+            this.isCompl = false;
+        }
+        else{
+          this.classes.push(_class)
+          //Alert class successfully created
+          this.flash('Clase "' + _class.title.toLowerCase()  + '" añadida correctamente', 'success', {
+            important: true,
+            timeout: 3300,
+            pauseOnInteract: true
+          })
+          //alert('Bien!')
+        }
       }
     },
     checkConflicts(_class){
@@ -90,7 +131,6 @@ export default {
           }
         }
       }
-      console.log('conflicts: ', conflicts);
       return conflicts;
     },
     checkConflict(schedule, day){ //Returns the plannedSchedule object which the parameter schedule conflicts with.
@@ -117,17 +157,12 @@ export default {
       return intSrting.substring(0,2) + ':' + intSrting.substring(2,4)
     },
     convertTitle(classTitle){
-      if(classTitle.length > 31){
-        return classTitle.substring(0,30) + '...'
-      }else{
-        return classTitle
-      }
+      return classTitle.toLowerCase();
     },
     generateDetail(class_){
       return class_.title;
     },
     hoverClass(_class){
-      console.log(_class);
       const conflicts = this.checkConflicts(_class);
       _class.conflicts = conflicts;
       this.hoveredClass = _class;
@@ -141,22 +176,64 @@ export default {
       let schedules = [
         [],[],[],[],[],[] //Models days from monday to saturday
       ]
-      for(const classSchedule of _class.schedules){
-        for(const day of jsonDays){
-          if(classSchedule[day]){
-            const index = jsonDays.indexOf(day)
-            schedules[index].push({
-              dateStart: this.convertToDate(classSchedule.time_ini),
-              dateEnd: this.convertToDate(classSchedule.time_fin),
-              title: this.convertTitle(_class.title),
-              detail: this.generateDetail(_class)
-            });
+
+      const classArray = [_class];
+      if(this.registeringCompl){
+        classArray.push(this.magistralClass)
+      }
+      for(const _class_ of classArray){
+        for(const classSchedule of _class_.schedules){
+          for(const day of jsonDays){
+            if(classSchedule[day]){
+              
+              let isDuplicated = false;
+
+              //Store in variables to avoid calling parsing multiple times
+              const newDateStart = this.convertToDate(classSchedule.time_ini);
+              const newDateEnd = this.convertToDate(classSchedule.time_fin);
+              const newTitle = this.convertTitle(_class_.title);
+              const newDetail = this.generateDetail(_class_);
+
+              const index = jsonDays.indexOf(day);
+
+              for(const schedule of schedules[index]){
+                if(
+                  newDateStart === schedule.dateStart &&
+                  newDateEnd === schedule.dateEnd &&
+                  newTitle === schedule.title &&
+                  newDetail === schedule.detail
+                  ){
+                  isDuplicated = true;
+                  break;
+                }
+              }
+
+              if(!isDuplicated){
+                schedules[index].push({
+                  dateStart: this.convertToDate(classSchedule.time_ini),
+                  dateEnd: this.convertToDate(classSchedule.time_fin),
+                  title: this.convertTitle(_class_.title),
+                  detail: this.generateDetail(_class_)
+                });
+              }
+            }
           }
         }
       }
 
       schedules.conflicts = _class.conflicts;
       return schedules;
+    },
+    cancelCompl(){
+      this.registeringCompl = false;
+      this.magistralClass = {};
+      this.isCompl = false;
+    },
+    showA(){
+      this.showing8A = true;
+    },
+    showB(){
+      this.showing8A = false;
     }
   }
 }
@@ -202,5 +279,122 @@ span{
 ul {
   list-style-type: none;
   padding: 0;
+}
+
+.flash-message{
+  position: fixed;
+  bottom: 5vh;
+  right: 5vh;
+  z-index: 10;
+}
+
+/* tooltip styling */
+
+.tooltip {
+  display: block !important;
+  z-index: 10000;
+}
+
+.tooltip .tooltip-inner {
+  background: rgb(255, 208, 0);
+  color: black;
+  font-size: 0.9rem;
+  font-family: 'Avenir', Helvetica, Arial, sans-serif;
+  border-radius: 16px;
+  padding: 3px 6px 2px;
+}
+
+.tooltip .tooltip-arrow {
+  width: 0;
+  height: 0;
+  border-style: solid;
+  position: absolute;
+  margin: 5px;
+  border-color: rgb(255, 208, 0);
+  z-index: 1;
+}
+
+.tooltip[x-placement^="top"] {
+  margin-bottom: 5px;
+}
+
+.tooltip[x-placement^="top"] .tooltip-arrow {
+  border-width: 5px 5px 0 5px;
+  border-left-color: transparent !important;
+  border-right-color: transparent !important;
+  border-bottom-color: transparent !important;
+  bottom: -5px;
+  left: calc(50% - 5px);
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.tooltip[x-placement^="bottom"] {
+  margin-top: 5px;
+}
+
+.tooltip[x-placement^="bottom"] .tooltip-arrow {
+  border-width: 0 5px 5px 5px;
+  border-left-color: transparent !important;
+  border-right-color: transparent !important;
+  border-top-color: transparent !important;
+  top: -5px;
+  left: calc(50% - 5px);
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.tooltip[x-placement^="right"] {
+  margin-left: 5px;
+}
+
+.tooltip[x-placement^="right"] .tooltip-arrow {
+  border-width: 5px 5px 5px 0;
+  border-left-color: transparent !important;
+  border-top-color: transparent !important;
+  border-bottom-color: transparent !important;
+  left: -5px;
+  top: calc(50% - 5px);
+  margin-left: 0;
+  margin-right: 0;
+}
+
+.tooltip[x-placement^="left"] {
+  margin-right: 5px;
+}
+
+.tooltip[x-placement^="left"] .tooltip-arrow {
+  border-width: 5px 0 5px 5px;
+  border-top-color: transparent !important;
+  border-right-color: transparent !important;
+  border-bottom-color: transparent !important;
+  right: -5px;
+  top: calc(50% - 5px);
+  margin-left: 0;
+  margin-right: 0;
+}
+
+.tooltip.popover .popover-inner {
+  background: #f9f9f9;
+  color: black;
+  padding: 24px;
+  border-radius: 5px;
+  box-shadow: 0 5px 30px rgba(black, .1);
+}
+
+.tooltip.popover .popover-arrow {
+  border-color: #f9f9f9;
+}
+
+.tooltip[aria-hidden='true'] {
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity .15s, visibility .15s;
+}
+
+.tooltip[aria-hidden='false'] {
+  visibility: visible;
+  opacity: 1;
+  transition: opacity .15s ease-in-out;
 }
 </style>
