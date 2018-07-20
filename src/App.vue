@@ -6,6 +6,10 @@
         :addClass="addClass"
         :hoverClass="hoverClass"
         :unhoverClass="unhoverClass"
+        :magistralClass="magistralClass"
+        :registeringCompl="registeringCompl"
+        :isCompl="isCompl"
+        :cancelCompl="cancelCompl"
         />
       <div class='schedule-container'>
         <CustomSchedule
@@ -35,7 +39,10 @@ export default {
     return {
       classes: [],
       hoveredClass: undefined,
-      schedule_:[]
+      schedule_:[],
+      registeringCompl: false,
+      magistralClass: {},
+      isCompl: false
     }
   },
   computed: {
@@ -73,9 +80,25 @@ export default {
       }
       else
       {
-        this.classes.push(_class)
-        //Alert class successfully created
-        alert('Bien!')
+        if(_class.compl.length > 0 || _class.mag.length > 0){
+          if(_class.mag.length > 0){
+            this.isCompl = true;
+          }
+          this.magistralClass = _class;
+          this.registeringCompl = true;
+        }
+        else if(this.registeringCompl){
+          this.classes.push(this.magistralClass, _class);
+          this.magistralClass = {};
+          this.registeringCompl = false;
+          if(this.isCompl)
+            this.isCompl = false;
+        }
+        else{
+          this.classes.push(_class)
+          //Alert class successfully created
+          alert('Bien!')
+        }
       }
     },
     checkConflicts(_class){
@@ -117,11 +140,7 @@ export default {
       return intSrting.substring(0,2) + ':' + intSrting.substring(2,4)
     },
     convertTitle(classTitle){
-      if(classTitle.length > 31){
-        return classTitle.substring(0,30) + '...'
-      }else{
-        return classTitle
-      }
+      return classTitle.toLowerCase();
     },
     generateDetail(class_){
       return class_.title;
@@ -141,39 +160,46 @@ export default {
       let schedules = [
         [],[],[],[],[],[] //Models days from monday to saturday
       ]
-      for(const classSchedule of _class.schedules){
-        for(const day of jsonDays){
-          if(classSchedule[day]){
-            
-            let isDuplicated = false;
 
-            //Store in variables to avoid calling parsing multiple times
-            const newDateStart = this.convertToDate(classSchedule.time_ini);
-            const newDateEnd = this.convertToDate(classSchedule.time_fin);
-            const newTitle = this.convertTitle(_class.title);
-            const newDetail = this.generateDetail(_class);
+      const classArray = [_class];
+      if(this.registeringCompl){
+        classArray.push(this.magistralClass)
+      }
+      for(const _class_ of classArray){
+        for(const classSchedule of _class_.schedules){
+          for(const day of jsonDays){
+            if(classSchedule[day]){
+              
+              let isDuplicated = false;
 
-            const index = jsonDays.indexOf(day);
+              //Store in variables to avoid calling parsing multiple times
+              const newDateStart = this.convertToDate(classSchedule.time_ini);
+              const newDateEnd = this.convertToDate(classSchedule.time_fin);
+              const newTitle = this.convertTitle(_class_.title);
+              const newDetail = this.generateDetail(_class_);
 
-            for(const schedule of schedules[index]){
-              if(
-                newDateStart === schedule.dateStart &&
-                newDateEnd === schedule.dateEnd &&
-                newTitle === schedule.title &&
-                newDetail === schedule.detail
-                ){
-                isDuplicated = true;
-                break;
+              const index = jsonDays.indexOf(day);
+
+              for(const schedule of schedules[index]){
+                if(
+                  newDateStart === schedule.dateStart &&
+                  newDateEnd === schedule.dateEnd &&
+                  newTitle === schedule.title &&
+                  newDetail === schedule.detail
+                  ){
+                  isDuplicated = true;
+                  break;
+                }
               }
-            }
 
-            if(!isDuplicated){
-              schedules[index].push({
-                dateStart: this.convertToDate(classSchedule.time_ini),
-                dateEnd: this.convertToDate(classSchedule.time_fin),
-                title: this.convertTitle(_class.title),
-                detail: this.generateDetail(_class)
-              });
+              if(!isDuplicated){
+                schedules[index].push({
+                  dateStart: this.convertToDate(classSchedule.time_ini),
+                  dateEnd: this.convertToDate(classSchedule.time_fin),
+                  title: this.convertTitle(_class_.title),
+                  detail: this.generateDetail(_class_)
+                });
+              }
             }
           }
         }
@@ -181,6 +207,11 @@ export default {
 
       schedules.conflicts = _class.conflicts;
       return schedules;
+    },
+    cancelCompl(){
+      this.registeringCompl = false;
+      this.magistralClass = {};
+      this.isCompl = false;
     }
   }
 }
