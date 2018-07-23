@@ -2,7 +2,7 @@
   <div id="app">
     <AcademicalBanner />
     <div id='container'>
-      <AcademicalSidebar 
+      <AcademicalSidebar
         :addClass="addClass"
         :hoverClass="hoverClass"
         :unhoverClass="unhoverClass"
@@ -16,8 +16,8 @@
         />
       <div class='schedule-container'>
         <CustomSchedule
-          :timeGround="[6, 21]" 
-          :weekGround="['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado']" 
+          :timeGround="[6, 21]"
+          :weekGround="['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado']"
           :taskDetail="schedule"
           :hoveredClassSchedules="convertBannerToSchedules(hoveredClass)"
           :removeClass="removeClass"
@@ -95,6 +95,7 @@ export default {
       }
       else
       {
+        this.checkEmpty(_class);
         if(_class.compl.length > 0 || _class.mag.length > 0){
           if(_class.mag.length > 0){
             this.isCompl = true;
@@ -121,6 +122,35 @@ export default {
         }
       }
     },
+    checkEmpty(_class){
+      let that = this;
+      let clase = _class.class+'-'+_class.course;
+      let section = _class.section;
+      let url = 'https://cuposuniandes.herokuapp.com/'+clase;
+      fetch(url, {mode: 'cors'})
+        .then(function(response) {
+          let jsonR = response.json().then(function(respJ){
+              respJ["records"].forEach(function(element){
+                if(element.section===section){
+                  if(element.empty>0){
+                    that.flash('Clase "' + _class.title.toLowerCase()  + '" tiene '+element.empty+' cupos.', 'success', {
+                      important: true,
+                      timeout: 3300,
+                      pauseOnInteract: true
+                    })
+                  }
+                  else{
+                    that.flash('La clase "' + _class.title.toLowerCase() + '" no tiene cupos disponibles.', 'error', {
+                      important: false,
+                      timeout: 4000,
+                      pauseOnInteract: true
+                    });
+                  }
+                }
+              });
+          });
+        });
+    },
     checkConflicts(_class){
       let conflicts = []
       for(const schedule of _class.schedules){
@@ -145,7 +175,7 @@ export default {
         //There is a conflict if
         if(startA >= startB && startA < endB){ //The start date of A is between the start and end of B
           return plannedSchedule;
-        } 
+        }
         else if(startB >= startA && endA > startB){ //The end date of A is after the start of B
           return plannedSchedule;
         }
@@ -187,7 +217,7 @@ export default {
         for(const classSchedule of _class_.schedules){
           for(const day of jsonDays){
             if(classSchedule[day]){
-              
+
               let isDuplicated = false;
 
               //Store in variables to avoid calling parsing multiple times
