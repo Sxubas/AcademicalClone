@@ -29,7 +29,7 @@
               Si estás interesado en aportar, todos los detalles técnicos están disponibles <a href="https://github.com/Sxubas/AcademicalClone" target="_blank">aquí</a>. 
             </p>
             <button class="modal-default-button" @click="$emit('close')">
-                Contuniar usando Academical <i class="material-icons">navigate_next</i>
+                Continuar usando Academical <i class="material-icons">navigate_next</i>
               </button>
           </div>
         </div>
