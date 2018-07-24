@@ -76,8 +76,9 @@ export default {
 
         const inTitle = course.title.toLowerCase().includes(this.search.toLowerCase())
         const inCRN = course.nrc.includes(this.search)
+        const inClassCourse = ( this.search.toLowerCase().includes(course.class.toLowerCase()) && this.search.toLowerCase().includes(course.course.toLowerCase()) )  || ( (course.class + ' ' + course.course).toLowerCase().includes(this.search) || (course.class + course.course).toLowerCase().includes(this.search) );
 
-        return inTitle || inCRN
+        return inTitle || inCRN || inClassCourse
       });
     
       // 8 week second-half courses
@@ -85,8 +86,9 @@ export default {
 
         const inTitle = course.title.toLowerCase().includes(this.search.toLowerCase())
         const inCRN = course.nrc.includes(this.search)
+        const inClassCourse = ( this.search.toLowerCase().includes(course.class.toLowerCase()) && this.search.toLowerCase().includes(course.course.toLowerCase()) )  || ( (course.class + ' ' + course.course).toLowerCase().includes(this.search) || (course.class + course.course).toLowerCase().includes(this.search) );
 
-        return inTitle || inCRN
+        return inTitle || inCRN || inClassCourse
       });
 
       return longCourses.concat(firstHalfCourses.concat(secondHalfCourses));
