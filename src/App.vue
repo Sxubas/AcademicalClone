@@ -5,7 +5,7 @@
       <BounceLoader :loading="loading" color="#3493E7"/>
       <h4 class="loading-text">
         Estamos verificando los cupos disponibles de los cursos <br>
-        Esto puede tomar unos segundos <br>
+        Esto puede tomar varios segundos <br>
         Gracias por su paciencia! <br>
         <academical-note>Después de terminar, se ejecutará en segundo plano para seguir actualizando los cupos</academical-note>
       </h4>
@@ -354,6 +354,8 @@ export default {
     //Will refresh every 5 mins empty courses
     //Props to El_kabs for implementing that awesome API! Si lees esto eres un crack.
     timeout = setInterval(this.checkEmptyCourses, 5 * 60 * 1000 /*5 minutes, in ms*/);
+
+    window.onbeforeunload = () => "Los horarios no se guardan, refrescar borra todas las materias planeadas"
   },
   destroyed(){
     clearInterval(timeout);
