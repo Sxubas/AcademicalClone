@@ -6,7 +6,8 @@
       <h4 class="loading-text">
         Estamos verificando los cupos disponibles de los cursos <br>
         Esto puede tomar unos segundos <br>
-        Gracias por su paciencia!
+        Gracias por su paciencia! <br>
+        <academical-note>Después de terminar, se ejecutará en segundo plano para seguir actualizando los cupos</academical-note>
       </h4>
     </div>
     <div v-else>
@@ -46,7 +47,9 @@ import CustomSchedule from './components/CustomSchedule';
 
 import BounceLoader from 'vue-spinner/src/PulseLoader.vue';
 
-import courses from './../courses.js';
+import courses from './../courses';
+import courses8A from './../courses8A';
+import courses8B from './../courses8B';
 
 const jsonDays = ["L", "M", "I", "J", "V", "S", "D"];
 
@@ -300,11 +303,31 @@ export default {
         }
         response.json().then( jsonResponse => {
           jsonResponse["records"].forEach( element => {
+            let found = false;
+
             for(let course of courses.records){
               if(course.nrc === element.nrc){
                 course.cupos = element.empty;
+                found = true;
+                break;
               }
             }
+
+            if(!found)
+              for(let course of courses8A.records){
+                if(course.nrc === element.nrc){
+                  course.cupos = element.empty;
+                  break;
+                }
+              }
+            if(!found)
+              for(let course of courses8B.records){
+                if(course.nrc === element.nrc){
+                  course.cupos = element.empty;
+                  break;
+                }
+              }
+
           });
           console.log('finished in ' + ( (new Date()).getTime() - benchmark ) + 'ms');
           this.loading = false;
@@ -519,5 +542,10 @@ ul {
   visibility: visible;
   opacity: 1;
   transition: opacity .15s ease-in-out;
+}
+
+academical-note{
+  font-size: 0.78rem;
+  color: gray;
 }
 </style>
