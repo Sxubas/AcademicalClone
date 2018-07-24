@@ -37,6 +37,7 @@
       </div>
       <flash-message class="flash-message"/>
     </div>
+    <AcademicalModalMessage v-if="showMessage && !loading" :show="showMessage" @close="showMessage = false"/>
   </div>
 </template>
 
@@ -44,6 +45,7 @@
 import AcademicalSidebar from './components/Sidebar';
 import AcademicalBanner from './components/Banner';
 import CustomSchedule from './components/CustomSchedule';
+import AcademicalModalMessage from './components/ModalMessage';
 
 import BounceLoader from 'vue-spinner/src/PulseLoader.vue';
 
@@ -61,7 +63,8 @@ export default {
     AcademicalBanner,
     AcademicalSidebar,
     CustomSchedule,
-    BounceLoader
+    BounceLoader,
+    AcademicalModalMessage
   },
   data () {
     return {
@@ -72,7 +75,8 @@ export default {
       magistralClass: {},
       isCompl: false,
       showing8A: true,
-      loading: true
+      loading: true,
+      showMessage: true
     }
   },
   computed: {
