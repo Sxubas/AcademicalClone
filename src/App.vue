@@ -1,30 +1,41 @@
 <template>
   <div id="app">
-    <AcademicalBanner />
-    <div id='container'>
-      <AcademicalSidebar 
-        :addClass="addClass"
-        :hoverClass="hoverClass"
-        :unhoverClass="unhoverClass"
-        :magistralClass="magistralClass"
-        :registeringCompl="registeringCompl"
-        :isCompl="isCompl"
-        :cancelCompl="cancelCompl"
-        :showing8A="showing8A"
-        :showA="showA"
-        :showB="showB"
-        />
-      <div class='schedule-container'>
-        <CustomSchedule
-          :timeGround="[6, 21]" 
-          :weekGround="['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado']" 
-          :taskDetail="schedule"
-          :hoveredClassSchedules="convertBannerToSchedules(hoveredClass)"
-          :removeClass="removeClass"
-          />
-      </div>
+    <div v-if="loading" class="loading-container">
+      <h2 class="loading-title">Cargando...</h2>
+      <BounceLoader :loading="loading" color="#3493E7"/>
+      <h4 class="loading-text">
+        Estamos verificando los cupos disponibles de los cursos <br>
+        Esto puede tomar unos segundos <br>
+        Gracias por su paciencia!
+      </h4>
     </div>
-    <flash-message class="flash-message"/>
+    <div v-else>
+      <AcademicalBanner />
+      <div id='container'>
+        <AcademicalSidebar
+          :addClass="addClass"
+          :hoverClass="hoverClass"
+          :unhoverClass="unhoverClass"
+          :magistralClass="magistralClass"
+          :registeringCompl="registeringCompl"
+          :isCompl="isCompl"
+          :cancelCompl="cancelCompl"
+          :showing8A="showing8A"
+          :showA="showA"
+          :showB="showB"
+          />
+        <div class='schedule-container'>
+          <CustomSchedule
+            :timeGround="[6, 21]"
+            :weekGround="['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado']"
+            :taskDetail="schedule"
+            :hoveredClassSchedules="convertBannerToSchedules(hoveredClass)"
+            :removeClass="removeClass"
+            />
+        </div>
+      </div>
+      <flash-message class="flash-message"/>
+    </div>
   </div>
 </template>
 
@@ -32,13 +43,22 @@
 import AcademicalSidebar from './components/Sidebar';
 import AcademicalBanner from './components/Banner';
 import CustomSchedule from './components/CustomSchedule';
+
+import BounceLoader from 'vue-spinner/src/PulseLoader.vue';
+
+import courses from './../courses.js';
+
 const jsonDays = ["L", "M", "I", "J", "V", "S", "D"];
+
+let timeout = undefined;
+
 export default {
   name: 'app',
   components:{
     AcademicalBanner,
     AcademicalSidebar,
-    CustomSchedule
+    CustomSchedule,
+    BounceLoader
   },
   data () {
     return {
@@ -48,7 +68,8 @@ export default {
       registeringCompl: false,
       magistralClass: {},
       isCompl: false,
-      showing8A: true
+      showing8A: true,
+      loading: true
     }
   },
   computed: {
@@ -95,6 +116,7 @@ export default {
       }
       else
       {
+        this.checkEmpty(_class);
         if(_class.compl.length > 0 || _class.mag.length > 0){
           if(_class.mag.length > 0){
             this.isCompl = true;
@@ -118,6 +140,17 @@ export default {
             pauseOnInteract: true
           })
           //alert('Bien!')
+        }
+      }
+    },
+    checkEmpty(_class){
+      if(_class.cupos){
+        if(_class.cupos <= 0){
+          this.flash('La clase que añadió NO tiene cupos disponibles', 'error', {
+            important: true,
+            timeout: 5500,
+            pauseOnInteract: true
+          })
         }
       }
     },
@@ -145,7 +178,7 @@ export default {
         //There is a conflict if
         if(startA >= startB && startA < endB){ //The start date of A is between the start and end of B
           return plannedSchedule;
-        } 
+        }
         else if(startB >= startA && endA > startB){ //The end date of A is after the start of B
           return plannedSchedule;
         }
@@ -187,7 +220,7 @@ export default {
         for(const classSchedule of _class_.schedules){
           for(const day of jsonDays){
             if(classSchedule[day]){
-              
+
               let isDuplicated = false;
 
               //Store in variables to avoid calling parsing multiple times
@@ -248,12 +281,88 @@ export default {
           })
         }
       }
+    },
+    checkEmptyCourses(){
+
+      const benchmark = (new Date()).getTime();
+
+      const url = "https://cuposuniandes.herokuapp.com/";
+      fetch(url, { mode: 'cors' }).then( response => {
+        if(response.status === 500)
+        {
+          console.log(response);
+          this.loading = false;
+          this.flash('Hubo un error actualizando los cupos disponibles de los cursos', 'error', {
+            important : true,
+            timeout: 5500,
+            pauseOnInteract: true
+          });
+        }
+        response.json().then( jsonResponse => {
+          jsonResponse["records"].forEach( element => {
+            for(let course of courses.records){
+              if(course.nrc === element.nrc){
+                course.cupos = element.empty;
+              }
+            }
+          });
+          console.log('finished in ' + ( (new Date()).getTime() - benchmark ) + 'ms');
+          this.loading = false;
+          this.flash('Cupos actualizados correctamente', 'info', {
+            important: true,
+            timeout: 5500,
+            pauseOnInteract: true
+          });
+        });
+      })
+      .catch(error => {
+        console.log(error)
+        this.loading = false;
+        this.flash('Hubo un error actualizando los cupos disponibles de los cursos', 'error', {
+            important : true,
+            timeout: 5500,
+            pauseOnInteract: true
+          });
+      });
     }
+  },
+  mounted(){
+    this.checkEmptyCourses();
+    //Will refresh every 5 mins empty courses
+    //Props to El_kabs for implementing that awesome API! Si lees esto eres un crack.
+    timeout = setInterval(this.checkEmptyCourses, 5 * 60 * 1000 /*5 minutes, in ms*/);
+  },
+  destroyed(){
+    clearInterval(timeout);
   }
 }
 </script>
 
 <style>
+
+.loading-container{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  width: 100vw;
+  font-size: 1.5rem;
+  color: rgb(52, 147, 231);
+  font-family: 'Avenir', Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-align: center;
+}
+
+.loading-title{
+
+}
+
+.loading-text{
+  
+}
+
 body{
   margin: 0px;
 }
