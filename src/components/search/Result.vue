@@ -1,9 +1,9 @@
 <template>
   <div class="result-container" @click="addLocalClass" @mouseover="hoverLocalClass" @mouseleave="unhoverLocalClass">
     <div class="top-info">
-      <div>{{result.class + ' ' + result.course}}</div>
-      <div>sección {{result.section}}</div>
-      <div>CRN: {{result.nrc}}</div>
+      <div>{{result.class + ' ' + result.course}}-{{result.section}}</div>
+      <div>cupos: {{result.cupos ? result.cupos : "No disponible :("}} </div>
+      <div>NRC: {{result.nrc}}</div>
     </div>
     <div class="title">{{title}}</div>
     <div class="bottom-container">
@@ -31,9 +31,7 @@
           v-tooltip="'Segundo ciclo del semestre'"
           class="material-icons">filter_2</i>
       </div>
-    </div>
-    
-    
+    </div>    
   </div>
 </template>
 

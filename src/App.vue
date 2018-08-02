@@ -1,29 +1,43 @@
 <template>
   <div id="app">
-    <AcademicalBanner />
-    <div id='container'>
-      <AcademicalSidebar 
-        :addClass="addClass"
-        :hoverClass="hoverClass"
-        :unhoverClass="unhoverClass"
-        :magistralClass="magistralClass"
-        :registeringCompl="registeringCompl"
-        :isCompl="isCompl"
-        :cancelCompl="cancelCompl"
-        :showing8A="showing8A"
-        :showA="showA"
-        :showB="showB"
-        />
-      <div class='schedule-container'>
-        <CustomSchedule
-          :timeGround="[6, 21]" 
-          :weekGround="['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado']" 
-          :taskDetail="schedule"
-          :hoveredClassSchedules="convertBannerToSchedules(hoveredClass)"
-          />
-      </div>
+    <div v-if="loading" class="loading-container">
+      <h2 class="loading-title">Cargando...</h2>
+      <BounceLoader :loading="loading" color="#3493E7"/>
+      <h4 class="loading-text">
+        Estamos verificando los cupos disponibles de los cursos <br>
+        Esto puede tomar varios segundos <br>
+        Gracias por su paciencia! <br>
+        <academical-note>Después de terminar, se ejecutará en segundo plano para seguir actualizando los cupos</academical-note>
+      </h4>
     </div>
-    <flash-message class="flash-message"/>
+    <div v-else>
+      <AcademicalBanner />
+      <div id='container'>
+        <AcademicalSidebar
+          :addClass="addClass"
+          :hoverClass="hoverClass"
+          :unhoverClass="unhoverClass"
+          :magistralClass="magistralClass"
+          :registeringCompl="registeringCompl"
+          :isCompl="isCompl"
+          :cancelCompl="cancelCompl"
+          :showing8A="showing8A"
+          :showA="showA"
+          :showB="showB"
+          />
+        <div class='schedule-container'>
+          <CustomSchedule
+            :timeGround="[6, 21]"
+            :weekGround="['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado']"
+            :taskDetail="schedule"
+            :hoveredClassSchedules="convertBannerToSchedules(hoveredClass)"
+            :removeClass="removeClass"
+            />
+        </div>
+      </div>
+      <flash-message class="flash-message"/>
+    </div>
+    <AcademicalModalMessage v-if="showMessage && !loading" :show="showMessage" @close="showMessage = false"/>
   </div>
 </template>
 
@@ -31,13 +45,26 @@
 import AcademicalSidebar from './components/Sidebar';
 import AcademicalBanner from './components/Banner';
 import CustomSchedule from './components/CustomSchedule';
+import AcademicalModalMessage from './components/ModalMessage';
+
+import BounceLoader from 'vue-spinner/src/PulseLoader.vue';
+
+import courses from './../courses';
+import courses8A from './../courses8A';
+import courses8B from './../courses8B';
+
 const jsonDays = ["L", "M", "I", "J", "V", "S", "D"];
+
+let timeout = undefined;
+
 export default {
   name: 'app',
   components:{
     AcademicalBanner,
     AcademicalSidebar,
-    CustomSchedule
+    CustomSchedule,
+    BounceLoader,
+    AcademicalModalMessage
   },
   data () {
     return {
@@ -47,7 +74,9 @@ export default {
       registeringCompl: false,
       magistralClass: {},
       isCompl: false,
-      showing8A: true
+      showing8A: true,
+      loading: true,
+      showMessage: true
     }
   },
   computed: {
@@ -65,7 +94,8 @@ export default {
                   dateStart: this.convertToDate(classSchedule.time_ini),
                   dateEnd: this.convertToDate(classSchedule.time_fin),
                   title: this.convertTitle(class_.title),
-                  detail: this.generateDetail(class_)
+                  detail: this.generateDetail(class_),
+                  nrc: class_.nrc
                 })
               }
             }
@@ -93,6 +123,7 @@ export default {
       }
       else
       {
+        this.checkEmpty(_class);
         if(_class.compl.length > 0 || _class.mag.length > 0){
           if(_class.mag.length > 0){
             this.isCompl = true;
@@ -116,6 +147,17 @@ export default {
             pauseOnInteract: true
           })
           //alert('Bien!')
+        }
+      }
+    },
+    checkEmpty(_class){
+      if(_class.cupos){
+        if(_class.cupos <= 0){
+          this.flash('La clase que añadió NO tiene cupos disponibles', 'error', {
+            important: true,
+            timeout: 5500,
+            pauseOnInteract: true
+          })
         }
       }
     },
@@ -143,7 +185,7 @@ export default {
         //There is a conflict if
         if(startA >= startB && startA < endB){ //The start date of A is between the start and end of B
           return plannedSchedule;
-        } 
+        }
         else if(startB >= startA && endA > startB){ //The end date of A is after the start of B
           return plannedSchedule;
         }
@@ -185,7 +227,7 @@ export default {
         for(const classSchedule of _class_.schedules){
           for(const day of jsonDays){
             if(classSchedule[day]){
-              
+
               let isDuplicated = false;
 
               //Store in variables to avoid calling parsing multiple times
@@ -234,12 +276,122 @@ export default {
     },
     showB(){
       this.showing8A = false;
+    },
+    removeClass(class_){
+      for(const _class of this.classes){
+        if(_class.nrc === class_.nrc){
+          const index = this.classes.indexOf(_class);
+          this.classes.splice(index, 1)
+          this.flash('Clase "' + class_.title.toLowerCase() + '" removida correctamente', 'success', {
+            important: true,
+            timeout: 4400
+          })
+        }
+      }
+    },
+    checkEmptyCourses(){
+
+      const benchmark = (new Date()).getTime();
+
+      const url = "https://cuposuniandes.herokuapp.com/";
+      fetch(url, { mode: 'cors' }).then( response => {
+        if(response.status === 500)
+        {
+          console.log(response);
+          this.loading = false;
+          this.flash('Hubo un error actualizando los cupos disponibles de los cursos', 'error', {
+            important : true,
+            timeout: 5500,
+            pauseOnInteract: true
+          });
+        }
+        response.json().then( jsonResponse => {
+          jsonResponse["records"].forEach( element => {
+            let found = false;
+
+            for(let course of courses.records){
+              if(course.nrc === element.nrc){
+                course.cupos = element.empty;
+                found = true;
+                break;
+              }
+            }
+
+            if(!found)
+              for(let course of courses8A.records){
+                if(course.nrc === element.nrc){
+                  course.cupos = element.empty;
+                  break;
+                }
+              }
+            if(!found)
+              for(let course of courses8B.records){
+                if(course.nrc === element.nrc){
+                  course.cupos = element.empty;
+                  break;
+                }
+              }
+
+          });
+          console.log('finished in ' + ( (new Date()).getTime() - benchmark ) + 'ms');
+          this.loading = false;
+          this.flash('Cupos actualizados correctamente', 'info', {
+            important: true,
+            timeout: 5500,
+            pauseOnInteract: true
+          });
+        });
+      })
+      .catch(error => {
+        console.log(error)
+        this.loading = false;
+        this.flash('Hubo un error actualizando los cupos disponibles de los cursos', 'error', {
+            important : true,
+            timeout: 5500,
+            pauseOnInteract: true
+          });
+      });
     }
+  },
+  mounted(){
+    this.checkEmptyCourses();
+    //Will refresh every 5 mins empty courses
+    //Props to El_kabs for implementing that awesome API! Si lees esto eres un crack.
+    timeout = setInterval(this.checkEmptyCourses, 5 * 60 * 1000 /*5 minutes, in ms*/);
+
+    window.onbeforeunload = () => "Los horarios no se guardan, refrescar borra todas las materias planeadas"
+  },
+  destroyed(){
+    clearInterval(timeout);
   }
 }
 </script>
 
 <style>
+
+.loading-container{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  width: 100vw;
+  font-size: 1.5rem;
+  color: rgb(52, 147, 231);
+  font-family: 'Avenir', Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-align: center;
+}
+
+.loading-title{
+
+}
+
+.loading-text{
+  
+}
+
 body{
   margin: 0px;
 }
@@ -396,5 +548,10 @@ ul {
   visibility: visible;
   opacity: 1;
   transition: opacity .15s ease-in-out;
+}
+
+academical-note{
+  font-size: 0.78rem;
+  color: gray;
 }
 </style>

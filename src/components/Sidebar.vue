@@ -1,8 +1,10 @@
 <template>
   <div class="sidebar-container">
+    <AcademicalModal v-if="showingInfo" @close="showingInfo = false"/>
     <div class="icon-container">
       <i  
-        v-tooltip="'Más información'"        
+        v-tooltip="'Más información'"
+        @click="showingInfo=true"        
         class="material-icons">help_outline</i>
       <i 
         v-tooltip="'Mostrar cursos de las primeras 8 semanas del semestre'" 
@@ -17,7 +19,7 @@
     </div>
     <div class="search-bar">
       <i class="material-icons">search</i>
-      <input class="search" v-model="search" placeholder="Buscar por CRN o nombre de la materia"/>
+      <input class="search" v-model="search" placeholder="Buscar por NRC o nombre de la materia"/>
     </div>
     <div v-if="registeringCompl" class="info-container">
         La clase {{magistralClass.title}} cuenta con las siguientes secciones {{ isCompl ? ' magistrales' : ' complementarias'}}:
@@ -41,12 +43,13 @@
 </template>
 
 <script>
-
+import AcademicalModal from './Modal';
 import AcademicalSearchResults from './search/ResultList';
 
 export default {
   components:{
-    AcademicalSearchResults
+    AcademicalSearchResults,
+    AcademicalModal
   },
   props:[
     'addClass',
@@ -62,7 +65,8 @@ export default {
   ],
   data(){
     return {
-      search: ''
+      search: '',
+      showingInfo: false
     }
   }
 }
