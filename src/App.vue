@@ -89,13 +89,14 @@ export default {
           for(const classSchedule of class_.schedules){
             for(const day of jsonDays){
               if(classSchedule[day]){
-                const index = jsonDays.indexOf(day)
+                const index = jsonDays.indexOf(day);
                 schedule[index].push({
                   dateStart: this.convertToDate(classSchedule.time_ini),
                   dateEnd: this.convertToDate(classSchedule.time_fin),
                   title: this.convertTitle(class_.title),
                   detail: this.generateDetail(class_),
-                  nrc: class_.nrc
+                  nrc: class_.nrc,
+                  classroom: classSchedule.classroom.slice(1)
                 })
               }
             }
@@ -218,13 +219,13 @@ export default {
       let schedules = [
         [],[],[],[],[],[] //Models days from monday to saturday
       ]
-
       const classArray = [_class];
       if(this.registeringCompl){
         classArray.push(this.magistralClass)
       }
       for(const _class_ of classArray){
         for(const classSchedule of _class_.schedules){
+          let classRoom= classSchedule.classroom;
           for(const day of jsonDays){
             if(classSchedule[day]){
 
@@ -255,7 +256,8 @@ export default {
                   dateStart: this.convertToDate(classSchedule.time_ini),
                   dateEnd: this.convertToDate(classSchedule.time_fin),
                   title: this.convertTitle(_class_.title),
-                  detail: this.generateDetail(_class_)
+                  detail: this.generateDetail(_class_),
+                  classroom: classRoom.slice(1)
                 });
               }
             }

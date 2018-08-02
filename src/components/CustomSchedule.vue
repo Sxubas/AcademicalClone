@@ -4,8 +4,8 @@
         <div v-for="n in totalCells" :key="n" class="cell">{{ textBackgroundCell(calcPositionCell(n)) }}</div>
    </div>
    <div id="courses-grid" class="schedule-grid">
-       <div v-for="course in scheduleArray" @click="removeClass(course)" class="course-cell" :style="coursePosition(course)">{{course.title}}</div>
-       <div v-for="hoveredClass in hoveredClassArray" class="course-cell" :style="[coursePosition(hoveredClass), hoveredStyle(hoveredClass)]">{{hoveredClass.title}}</div>
+       <div v-for="course in scheduleArray" @click="removeClass(course)" class="course-cell" :style="coursePosition(course)">{{course.title}}<p>{{course.classroom}}</p></div>
+       <div v-for="hoveredClass in hoveredClassArray" class="course-cell" :style="[coursePosition(hoveredClass), hoveredStyle(hoveredClass)]">{{hoveredClass.title}}<p>{{hoveredClass.classroom}}</p></div>
    </div> 
 </div>
 </template>
