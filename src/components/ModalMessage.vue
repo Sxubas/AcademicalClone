@@ -12,10 +12,10 @@
 
           <div class="modal-body">
             <p>
-              Lastimosamente hace poco registro actualizó su página web, dejando las consultas de nuestro recolector de cupos muy lentas.
+              Lastimosamente hace poco registro actualizó su página web, bloqueando las consultas de nuestro recolector de cupos.
             </p>
             <p>
-              Los cupos se siguen actualizando pero a una velocidad MUY reducida. Por esto, recomendamos no confiarse con los cupos que se muestran acá.
+              <!-- Los cupos se siguen actualizando pero a una velocidad MUY reducida. --> Por esto, los cupos que se muestran están <b>desactualizados</b>.
             </p>
 
             <p>
