@@ -4,7 +4,7 @@
         <div v-for="n in totalCells" :key="n" class="cell">{{ textBackgroundCell(calcPositionCell(n)) }}</div>
    </div>
    <div id="courses-grid" class="schedule-grid">
-       <div v-for="course in scheduleArray" @click="removeClass(course)" class="course-cell" :style="coursePosition(course)">{{course.title}}<p>{{course.classroom}}</p></div>
+       <div v-for="course in scheduleArray" @click="removeClass(course)" class="course-cell" :style="coursePosition(course)">{{classTitle(course.title)}}<p class="classroom">{{course.classroom}}</p></div>
        <div v-for="hoveredClass in hoveredClassArray" class="course-cell" :style="[coursePosition(hoveredClass), hoveredStyle(hoveredClass)]">{{hoveredClass.title}}<p>{{hoveredClass.classroom}}</p></div>
    </div> 
 </div>
@@ -145,6 +145,12 @@ export default {
         else{
           return { 'background-color': 'rgba(84,155,226,0.7)' }
         }
+      },
+      classTitle(title){
+        if(title.length > 35)
+          return title.substring(0,38) + '...';
+        else
+          return title;
       }
   },
   mounted(){
@@ -212,6 +218,14 @@ export default {
     position:absolute;
     top:0;
     left:0;
+}
+
+.classroom {
+  margin-top: 8px;
+  padding: 0;
+  font-size: 0.9rem;
+  color: #242428;
+  font-weight: bold;
 }
 
 </style>
