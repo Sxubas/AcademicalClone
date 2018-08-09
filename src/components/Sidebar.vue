@@ -182,5 +182,17 @@ i:active{
   background-color: rgb(35, 116, 187);  
 }
 
+::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
+    color: whitesmoke;
+    opacity: 1; /* Firefox */
+}
+
+:-ms-input-placeholder { /* Internet Explorer 10-11 */
+    color: whitesmoke;
+}
+
+::-ms-input-placeholder { /* Microsoft Edge */
+    color: whitesmoke;
+}
 
 </style>
