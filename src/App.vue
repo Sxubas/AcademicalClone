@@ -52,6 +52,7 @@ import BounceLoader from 'vue-spinner/src/PulseLoader.vue';
 import courses from './../data/courses.json';
 import courses8A from './../data/courses8A.json';
 import courses8B from './../data/courses8B.json';
+import coursesMED from './../data/coursesMED.json';
 
 const jsonDays = ["L", "M", "I", "J", "V", "S", "D"];
 const WELCOME_MESSAGE = 'holidays';
@@ -86,7 +87,7 @@ export default {
         [],[],[],[],[],[] //Models days from monday to saturday
       ]
       for(const class_ of this.classes){
-        if((class_.cycle === '8A' && this.showing8A) || (class_.cycle === '8B' && !this.showing8A) || class_.cycle === "1"){
+        if((class_.cycle === '8A' && this.showing8A) || (class_.cycle === '8B' && !this.showing8A) || class_.cycle === "1" || class_.cycle === "3"){
           for(const classSchedule of class_.schedules){
             for(const day of jsonDays){
               if(classSchedule[day]){
@@ -337,6 +338,14 @@ export default {
                   break;
                 }
               }
+            
+            if(!found)
+              for(let course of coursesMED.records){
+                if(course.nrc === element.nrc){
+                  course.cupos = element.empty;
+                  break;
+                }
+              }
 
           });
           console.log('finished in ' + ( (new Date()).getTime() - benchmark ) + 'ms');
@@ -390,7 +399,7 @@ export default {
   height: 100vh;
   width: 100vw;
   font-size: 1.5rem;
-  color: rgb(52, 147, 231);
+  color: #4286f4;
   font-family: 'Avenir', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;

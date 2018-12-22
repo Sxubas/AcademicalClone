@@ -81,7 +81,7 @@ export default {
   max-width: 400px;
   min-width: 270px;
   height: calc(100vh - 90px);
-  background-color: rgb(52, 147, 231);
+  background-color: #4286f4;
   padding: 8px;
   color: whitesmoke;
 }

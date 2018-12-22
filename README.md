@@ -1,27 +1,18 @@
-# academical-clone
+# Academical Clone
+ 
+[Academical](https://uniandes.academical.co/) clone to easen schedule planning @ Uniandes.
 
-  
+It contains all courses from Los Andes university (including medicine ones) to plan a schedule for the next semester.  
 
-> [Academical](https://uniandes.academical.co/) clone to easen schedule planning @ Uniandes
-  
-
-## Build Setup
-
-Frontend made in Vue.js 2 using webpack-simple template
-  
+## Setup
+Only-frontend webapp made in Vue.js   
 
 ``` bash
-
 # install dependencies
 npm install  
-
 # serve with hot reload at localhost:8080
 npm run dev  
-
-# build for production with minification
-npm run build
-
 ```
 
-  
-
+## License
+MIT

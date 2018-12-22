@@ -48,7 +48,7 @@ export default {
 <style scoped>
 
 a{
-  color: rgb(52, 147, 231);
+  color: #4286f4;
 }
 
 .modal-mask {
@@ -83,7 +83,7 @@ a{
 
 .modal-header h3 {
   margin-top: 0;
-  color: rgb(52, 147, 231);
+  color: #4286f4;
 }
 
 .modal-body {

@@ -42,6 +42,7 @@ import AcademicalSearchResult from './Result';
 import courses from '../../../data/courses.json';
 import courses8A from '../../../data/courses8A.json';
 import courses8B from '../../../data/courses8B.json';
+import coursesMED from '../../../data/coursesMED.json';
 
 export default {
   components:{
@@ -66,7 +67,7 @@ export default {
 
         const inTitle = course.title.toLowerCase().includes(this.search.toLowerCase())
         const inCRN = course.nrc.includes(this.search)
-        const inClassCourse = ( this.search.toLowerCase().includes(course.class.toLowerCase()) && this.search.toLowerCase().includes(course.course.toLowerCase()) )  || ( (course.class + ' ' + course.course).toLowerCase().includes(this.search) || (course.class + course.course).toLowerCase().includes(this.search) );
+        const inClassCourse = ( this.search.toLowerCase().includes(course.class.toLowerCase()) && this.search.toLowerCase().includes(course.course.toLowerCase()) )  || ( (course.class + ' ' + course.course).toLowerCase().includes(this.search) || (course.class + course.course).toLowerCase().includes(this.search.toLowerCase()) );
 
         return inTitle || inCRN || inClassCourse
       });
@@ -76,7 +77,7 @@ export default {
 
         const inTitle = course.title.toLowerCase().includes(this.search.toLowerCase())
         const inCRN = course.nrc.includes(this.search)
-        const inClassCourse = ( this.search.toLowerCase().includes(course.class.toLowerCase()) && this.search.toLowerCase().includes(course.course.toLowerCase()) )  || ( (course.class + ' ' + course.course).toLowerCase().includes(this.search) || (course.class + course.course).toLowerCase().includes(this.search) );
+        const inClassCourse = ( this.search.toLowerCase().includes(course.class.toLowerCase()) && this.search.toLowerCase().includes(course.course.toLowerCase()) )  || ( (course.class + ' ' + course.course).toLowerCase().includes(this.search) || (course.class + course.course).toLowerCase().includes(this.search.toLowerCase()) );
 
         return inTitle || inCRN || inClassCourse
       });
@@ -86,12 +87,22 @@ export default {
 
         const inTitle = course.title.toLowerCase().includes(this.search.toLowerCase())
         const inCRN = course.nrc.includes(this.search)
-        const inClassCourse = ( this.search.toLowerCase().includes(course.class.toLowerCase()) && this.search.toLowerCase().includes(course.course.toLowerCase()) )  || ( (course.class + ' ' + course.course).toLowerCase().includes(this.search) || (course.class + course.course).toLowerCase().includes(this.search) );
+        const inClassCourse = ( this.search.toLowerCase().includes(course.class.toLowerCase()) && this.search.toLowerCase().includes(course.course.toLowerCase()) )  || ( (course.class + ' ' + course.course).toLowerCase().includes(this.search) || (course.class + course.course).toLowerCase().includes(this.search.toLowerCase()) );
 
         return inTitle || inCRN || inClassCourse
       });
 
-      return longCourses.concat(firstHalfCourses.concat(secondHalfCourses));
+      // 8 week second-half courses
+      const medicineCourses = coursesMED.records.filter(course => {
+
+        const inTitle = course.title.toLowerCase().includes(this.search.toLowerCase())
+        const inCRN = course.nrc.includes(this.search)
+        const inClassCourse = ( this.search.toLowerCase().includes(course.class.toLowerCase()) && this.search.toLowerCase().includes(course.course.toLowerCase()) )  || ( (course.class + ' ' + course.course).toLowerCase().includes(this.search) || (course.class + course.course).toLowerCase().includes(this.search.toLowerCase()) );
+
+        return inTitle || inCRN || inClassCourse
+      });
+
+      return longCourses.concat(firstHalfCourses.concat(secondHalfCourses.concat(medicineCourses)));
     }
   }
 }

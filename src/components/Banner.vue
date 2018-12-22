@@ -19,7 +19,7 @@ export default {
   padding-left: 10px;
   height: 80px;
   width: 100vw;
-  background-color: rgb(52, 147, 231);
+  background-color: #4286f4;
   color: white;
 }
 

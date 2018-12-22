@@ -1,11 +1,26 @@
 <template>
 <div class="container">
    <div id="background-grid" class="schedule-grid">
-        <div v-for="n in totalCells" :key="n" class="cell">{{ textBackgroundCell(calcPositionCell(n)) }}</div>
+        <div v-for="n in totalCells" :key="n" :class="['cell']">{{ textBackgroundCell(calcPositionCell(n)) }}</div>
    </div>
    <div id="courses-grid" class="schedule-grid">
-       <div v-for="course in scheduleArray" @click="removeClass(course)" class="course-cell" :style="coursePosition(course)">{{classTitle(course.title)}}<p class="classroom">{{course.classroom}}</p></div>
-       <div v-for="hoveredClass in hoveredClassArray" class="course-cell" :style="[coursePosition(hoveredClass), hoveredStyle(hoveredClass)]">{{hoveredClass.title}}<p>{{hoveredClass.classroom}}</p></div>
+      <div 
+        v-for="(course, i) in scheduleArray"
+        :key="course.nrc + ' ' + i"
+        @click="removeClass(course)"
+        class="course-cell"
+        :style="coursePosition(course)">
+          {{classTitle(course.title)}}
+          <p class="classroom">{{course.classroom}}</p>
+      </div>
+      <div 
+        v-for="(hoveredClass, i) in hoveredClassArray"
+        class="course-cell"
+        :style="[coursePosition(hoveredClass), hoveredStyle(hoveredClass)]"
+        :key="hoveredClass.nrc + 'hover'+ i">
+          {{hoveredClass.title}}
+          <p>{{hoveredClass.classroom}}</p>
+      </div>
    </div> 
 </div>
 </template>
@@ -161,24 +176,60 @@ export default {
       grid= document.getElementById('courses-grid');
       grid.style.gridTemplateColumns="100px repeat("+this.weekGround.length+",1fr)" 
       grid.style.gridTemplateRows="repeat("+this.hoursCount+",1fr)" 
-
   }
 
 }
 </script>
 <style scoped>
 
-.cell{
-    display:inline-block;
-    border:1px solid #5d626b;
+.schedule-table{
+    border-collapse: collapse;
     width: 100%;
-    height: 100%;
-    font-size:1rem;
-    background-color: #eee;
-    text-align: center;
-	box-sizing:border-box;
+    margin-left: 2px;
+    table-layout: fixed;
 }
 
+.cell{
+    border: 1px solid #dddddd;
+    /* width: calc((100% / 6) - (50px / 6)); */
+    color:#8b8b8b;
+    height: 30px;
+    box-sizing: border-box;
+}
+
+.first-col{
+    box-sizing: border-box;
+    width: 50px;
+    overflow: hidden;
+    border-top: 1px solid #dddddd;
+    border-bottom: 1px solid #dddddd;
+}
+
+.first-row{
+    box-shadow: 3px 0px 9px #3f3e3e;
+}
+
+.currentDay{
+    color:#e46411;
+}
+
+.week-day{
+    color:inherit;
+    text-align: left;
+    font-size: 0.7rem;
+    margin:0;
+    height:1rem;
+    margin-top:3px;
+    margin-left:5px;
+}
+
+.week-number{
+    color:inherit;
+    font-size: 3rem;
+    font-weight: 200;
+    margin:0;
+    height:3rem;
+}
 .container{
     position:relative;
     height: 100%;
@@ -192,12 +243,13 @@ export default {
 
 .course-cell
 {
+    color:white;
     display:inline-block;
-    border:1px solid #5d626b;
-    width: 100%;
+    width: 90%;
+    margin: 2px auto;
     max-height: 100%;
     font-size:1rem;
-    background-color: #4286f4;
+    background-color: #4286f4; 
     text-align: center;
 	  border-radius: 10px 10px 10px 10px; 
     transition: background-color 0.15s ease-in-out;
@@ -220,13 +272,17 @@ export default {
     left:0;
 }
 
+.course-title{
+    margin:0.5rem 0;
+    word-break: break-all;
+  font-weight: bold;
+}
+
 .classroom {
   margin-top: 8px;
   padding: 0;
   font-size: 0.9rem;
-  color: #242428;
-  font-weight: bold;
+  color: white;
 }
 
 </style>
-
