@@ -39,9 +39,9 @@
 <script>
 
 import AcademicalSearchResult from './Result';
-import courses from '../../../courses';
-import courses8A from '../../../courses8A';
-import courses8B from '../../../courses8B';
+import courses from '../../../data/courses.json';
+import courses8A from '../../../data/courses8A.json';
+import courses8B from '../../../data/courses8B.json';
 
 export default {
   components:{

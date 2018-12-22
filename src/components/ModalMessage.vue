@@ -6,20 +6,21 @@
 
           <div class="modal-header">
             <h3>
-              Cupos desactualizados
+              Felices fiestas
             </h3>
           </div>
 
           <div class="modal-body">
             <p>
-              Lastimosamente hace poco registro actualizó su página web, bloqueando las consultas de nuestro recolector de cupos.
-            </p>
-            <p>
-              <!-- Los cupos se siguen actualizando pero a una velocidad MUY reducida. --> Por esto, los cupos que se muestran están <b>desactualizados</b>.
+              Acabamos de actualizar a los cursos de 201910, muchas gracias por su paciencia! Esperamos que les sea de gran utilidad
             </p>
 
             <p>
-              Perdón por las incomodidades que esto pueda causar, puesto que se sale totalmente de nuestro alcance.
+              Al igual que versiones anteriores, los horarios <b>no se guardan</b> y por tanto se pierden al refrescar la página o cerrarla.
+            </p>
+
+            <p>
+              Les deseamos un excelente fin de año y mucha suerte inscribiendo materias.
             </p>
 
             <p>

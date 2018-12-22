@@ -2,7 +2,7 @@
   <div class="result-container" @click="addLocalClass" @mouseover="hoverLocalClass" @mouseleave="unhoverLocalClass">
     <div class="top-info">
       <div>{{result.class + ' ' + result.course}}-{{result.section}}</div>
-      <div>cupos: {{result.cupos ? result.cupos : "No disponible :("}} </div>
+      <!-- <div>cupos: {{result.cupos ? result.cupos : "No disponible :("}} </div> -->
       <div>NRC: {{result.nrc}}</div>
     </div>
     <div class="title">{{title}}</div>
@@ -100,7 +100,7 @@ export default {
 
 .top-info{
   display: flex;
-  justify-content: space-around;
+  justify-content: space-between;
   align-items: center;
   font-size: 0.8rem;
   padding: 4px;

@@ -49,11 +49,12 @@ import AcademicalModalMessage from './components/ModalMessage';
 
 import BounceLoader from 'vue-spinner/src/PulseLoader.vue';
 
-import courses from './../courses';
-import courses8A from './../courses8A';
-import courses8B from './../courses8B';
+import courses from './../data/courses.json';
+import courses8A from './../data/courses8A.json';
+import courses8B from './../data/courses8B.json';
 
 const jsonDays = ["L", "M", "I", "J", "V", "S", "D"];
+const WELCOME_MESSAGE = 'holidays';
 
 let timeout = undefined;
 
@@ -109,6 +110,9 @@ export default {
   },
   methods: {
     addClass(_class){
+
+      window.onbeforeunload = () => "Los horarios no se guardan, refrescar borra todas las materias planeadas"
+
       const conflicts = this.checkConflicts(_class);
       if (conflicts.length > 0)
       {
@@ -356,12 +360,19 @@ export default {
     }
   },
   mounted(){
-    this.checkEmptyCourses();
-    //Will refresh every 5 mins empty courses
-    //Props to El_kabs for implementing that awesome API! Si lees esto eres un crack.
-    timeout = setInterval(this.checkEmptyCourses, 5 * 60 * 1000 /*5 minutes, in ms*/);
+    // this.checkEmptyCourses(); not longer supported
+    let lastMessage = window.localStorage.getItem('AcademicalWelcomeMessage');
 
-    window.onbeforeunload = () => "Los horarios no se guardan, refrescar borra todas las materias planeadas"
+    //Only show when prior message was not shown or last message differs from the current one
+    if(!lastMessage || lastMessage !== WELCOME_MESSAGE){
+      this.showMessage = true;
+      window.localStorage.setItem('AcademicalWelcomeMessage', WELCOME_MESSAGE);
+    }
+    else{
+      this.showMessage = false;
+    }
+
+    this.loading = false;
   },
   destroyed(){
     clearInterval(timeout);
